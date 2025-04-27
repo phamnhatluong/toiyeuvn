@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Việt Nam trong trái tim tôi</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      height: 100vh;
+      background: #da251d;
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .question {
+      font-size: 3rem;
+      color: yellow;
+      margin: 1rem 0;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 50px;
+      background: yellow;
+      color: red;
+      font-weight: bold;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: white;
+      transform: scale(1.1);
+    }
+    .yes-btn, .no-btn { position: relative; }
+    /* Loading Animation */
+    .vn-flag-star {
+      width: 250px;
+      height: 250px;
+      background: yellow;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 
+                         79% 91%, 50% 70%, 21% 91%, 32% 57%, 
+                         2% 35%, 39% 35%);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .vn-flag-star::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple 2s infinite;
+    }
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+    }
+    .vn-text {
+      font-size: 3rem;
+      font-weight: bold;
+      color: yellow;
+      animation: slide-horizontal 8s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes slide-horizontal {
+      from { transform: translateX(100%); }
+      to { transform: translateX(-100%); }
+    }
+    /* Kết quả */
+    .star-wrapper {
+      width: 400px;
+      height: 400px;
+      background: yellow;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 
+                         79% 91%, 50% 70%, 21% 91%, 32% 57%, 
+                         2% 35%, 39% 35%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .result-text {
+      font-size: 2rem;
+      color: yellow;
+      opacity: 0;
+      transition: opacity 2s;
+    }
+    .fade-in {
+      opacity: 1;
+    }
+    video {
+      width: 80%;
+      height: 90%;
+      border-radius: 10px;
+    }
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .vn-flag-star, .star-wrapper { width: 200px; height: 200px; }
+      .vn-text { font-size: 2rem; }
+      .question { font-size: 2rem; }
+      .result-text { font-size: 1.5rem; }
+      .button-container { flex-direction: column; gap: 1rem; }
+      .btn { font-size: 1rem; padding: 0.6rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading screen -->
+  <div id="loading-screen" style="display: flex; flex-direction: column; align-items: center;">
+    <h1 style="color: yellow; font-size: 3rem; margin-bottom: 2rem;">Chào mừng bạn! 🇻🇳</h1>
+    <button id="enter-btn" class="btn">Vào trang</button>
+  </div>
+
+  <!-- Video Intro -->
+  <div class="intro-video-container container">
+    <video id="intro-video" src="download (4).mp4" playsinline></video>
+  </div>
+
+  <!-- Câu hỏi -->
+  <div class="question-container container">
+    <h2 class="question">Bạn có tự hào là người Việt Nam không?</h2>
+    <div class="button-container">
+      <a class="yes-btn btn js-yes-btn" href="#">Có ❤️</a>
+      <button class="no-btn btn js-no-btn">Không 😢</button>
+    </div>
+  </div>
+
+  <!-- Loading Animation -->
+  <div class="loading-container container">
+    <div class="vn-flag-star"></div>
+    <div class="vn-text">Tôi yêu Việt Nam</div>
+  </div>
+
+  <!-- Video kết quả -->
+  <div class="video-container container">
+    <video id="result-video" src="download (1).mp4" playsinline></video>
+  </div>
+
+  <!-- Kết quả cuối -->
+  <div class="result-container container">
+    <div class="star-wrapper"></div>
+    <h2 class="result-text">Việt Nam trong trái tim tôi ❤️</h2>
+  </div>
+
+  <script>
+    const loadingScreen = document.getElementById('loading-screen');
+    const enterBtn = document.getElementById('enter-btn');
+    const introContainer = document.querySelector('.intro-video-container');
+    const introVideo = document.getElementById('intro-video');
+    const questionContainer = document.querySelector('.question-container');
+    const loadingContainer = document.querySelector('.loading-container');
+    const videoContainer = document.querySelector('.video-container');
+    const resultContainer = document.querySelector('.result-container');
+    const yesBtn = document.querySelector('.js-yes-btn');
+    const noBtn = document.querySelector('.no-btn');
+    const resultText = document.querySelector('.result-text');
+    const resultVideo = document.getElementById('result-video');
+
+    // Khi bấm "Vào trang"
+    enterBtn.addEventListener('click', () => {
+      loadingScreen.style.display = 'none';
+      introContainer.style.display = 'flex';
+      introVideo.play();
+    });
+
+    // Khi Intro kết thúc
+    introVideo.addEventListener('ended', () => {
+      introContainer.style.display = 'none';
+      questionContainer.style.display = 'flex';
+    });
+
+    // Khi bấm "Có"
+    yesBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      questionContainer.style.display = 'none';
+      loadingContainer.style.display = 'flex';
+
+      // 4 giây sau ➔ hiện Video kết quả
+      setTimeout(() => {
+        loadingContainer.style.display = 'none';
+        videoContainer.style.display = 'flex';
+        resultVideo.muted = false; 
+        resultVideo.play();
+
+        // 5 giây sau ➔ hiện Sao vàng + Chữ
+        setTimeout(() => {
+          videoContainer.style.display = 'none';
+          resultContainer.style.display = 'flex';
+          resultText.classList.add('fade-in');
+        }, 18000);
+
+      }, 4000);
+    });
+
+    // Button "Không" chạy loạn
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      setInterval(() => {
+        const containerRect = questionContainer.getBoundingClientRect();
+        const btnWidth = noBtn.offsetWidth;
+        const btnHeight = noBtn.offsetHeight;
+        const maxX = containerRect.width - btnWidth;
+        const maxY = containerRect.height - btnHeight;
+        const newX = Math.floor(Math.random() * maxX);
+        const newY = Math.floor(Math.random() * maxY);
+        noBtn.style.left = `${newX}px`;
+        noBtn.style.top = `${newY}px`;
+        noBtn.style.position = "absolute";
+      }, 300);
+    } else {
+      noBtn.addEventListener('mouseover', () => {
+        const containerRect = questionContainer.getBoundingClientRect();
+        const btnWidth = noBtn.offsetWidth;
+        const btnHeight = noBtn.offsetHeight;
+        const maxX = containerRect.width - btnWidth;
+        const maxY = containerRect.height - btnHeight;
+        const newX = Math.floor(Math.random() * maxX);
+        const newY = Math.floor(Math.random() * maxY);
+        noBtn.style.left = `${newX}px`;
+        noBtn.style.top = `${newY}px`;
+        noBtn.style.position = "absolute";
+      });
+    }
+  </script>
+
+</body>
+</html>
